@@ -116,7 +116,7 @@ void on_create_clan_command(struct discord *client, const struct discord_interac
     }
 
     if (picture_attachment_id != 0 && event->data->resolved && event->data->resolved->attachments) {
-        for (int i = 0; i < event->data->resolved->attachments->size; i++) {
+        for (int i = 0; i < event->data->resolved->attachments->amount; i++) {
             struct discord_attachment *att = &event->data->resolved->attachments->array[i];
             if (att->id == picture_attachment_id) {
                 if (att->size > 4 * 1024 * 1024) {
@@ -176,7 +176,7 @@ void on_create_clan_command(struct discord *client, const struct discord_interac
 
     int clan_id = 0;
     if (db_clan_create(guild_id, clan_name, clan_desc, picture_url, user_id, created_role.id, &clan_id) != 0) {
-        discord_delete_guild_role(client, guild_id, created_role.id, NULL);
+        discord_delete_guild_role(client, guild_id, created_role.id, NULL, NULL);
         struct discord_interaction_response resp = {
             .type = DISCORD_INTERACTION_CHANNEL_MESSAGE_WITH_SOURCE,
             .data = &(struct discord_interaction_callback_data){
