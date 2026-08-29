@@ -37,7 +37,7 @@ static void done_ticket_created(struct discord *client,
         channel->id, user_id);
 
     if (user_id != 0) {
-        discord_add_thread_member(client, channel->id, user_id, NULL, NULL);
+        discord_add_thread_member(client, channel->id, user_id, NULL);
     }
 
     struct discord_embed_field fields[] = {

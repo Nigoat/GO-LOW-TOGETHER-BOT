@@ -145,7 +145,7 @@ void on_voice_state_update(struct discord *client, const struct discord_voice_st
             remove_tracked_channel_locked(idx);
 
             pthread_mutex_unlock(&g_voice_mutex);
-            discord_delete_channel(client, left_channel_id, NULL);
+            discord_delete_channel(client, left_channel_id, NULL, NULL);
             db_temp_voice_delete(left_channel_id);
             pthread_mutex_lock(&g_voice_mutex);
         } else if (user_id == owner_id) {
@@ -328,7 +328,7 @@ void on_voice_public_command(struct discord *client, const struct discord_intera
         return;
     }
 
-    discord_delete_channel_permission(client, ch_id, guild_id, NULL);
+    discord_delete_channel_permission(client, ch_id, guild_id, NULL, NULL);
 
     db_temp_voice_set_privacy(ch_id, 0);
 
