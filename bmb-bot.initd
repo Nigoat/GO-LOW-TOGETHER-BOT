@@ -1,0 +1,61 @@
+#!/sbin/openrc-run
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# Copyright (C) 2026 Go Low Together
+
+# so yes, before it was go low together, it was bmb, and im too lazy to create another user called GLT.
+#if it works dont touch it!
+name="bmb-bot"
+description="Go Low Together Discord Bot"
+
+BMB_USER="bmb-bot"
+BMB_DIR="/bot/GO-LOW-TOGETHER-BOT"
+BMB_BIN="${BMB_DIR}/bmb-bot"
+BMB_ENV="${BMB_DIR}/.env"
+BMB_LOG="/var/log/bmb-bot.log"
+
+command="${BMB_BIN}"
+command_user="${BMB_USER}"
+command_background=true
+pidfile="/run/${RC_SVCNAME}.pid"
+output_log="${BMB_LOG}"
+error_log="${BMB_LOG}"
+
+start_pre() {
+    if [ ! -f "${BMB_ENV}" ]; then
+        eerror "Environment file not found: ${BMB_ENV}"
+        return 1
+    fi
+    if [ ! -x "${BMB_BIN}" ]; then
+        eerror "Bot binary not found or not executable: ${BMB_BIN}"
+        return 1
+    fi
+    set -a
+    . "${BMB_ENV}"
+    set +a
+}
+
+stop() {
+    ebegin "Stopping ${RC_SVCNAME}"
+    start-stop-daemon --stop --pidfile "${pidfile}" --quiet
+    local ret=$?
+    eend $ret
+    return $ret
+}
+
+retry() {
+    einfo "Restarting ${RC_SVCNAME} in 5 seconds..."
+    sleep 5
+}
