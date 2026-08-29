@@ -44,7 +44,7 @@ static void done_ticket_created(struct discord *client,
         {
             .name = "🔒 Privacy Notice",
             .value = "This thread is private and only visible to you and the server staff.",
-            ._inline = false
+            .Inline = false
         }
     };
 
@@ -173,7 +173,7 @@ void on_send_ticket_command(struct discord *client, const struct discord_interac
             .value = "• State your question, bug report, or inquiry clearly.\n"
                      "• Please be patient while staff reviews your ticket.\n"
                      "• Keep all communication civil and constructive.",
-            ._inline = false
+            .Inline = false
         }
     };
 

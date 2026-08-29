@@ -118,12 +118,12 @@ void on_send_verify_command(struct discord *client, const struct discord_interac
                      "• Skill level tags (Beginner, Intermediate, Advanced, Wizard)\n"
                      "• Access to voice rooms and live coding channels\n"
                      "• Clan creation and invitations",
-            ._inline = false
+            .Inline = false
         },
         {
             .name = "🔒 Quick & Secure",
             .value = "Clicking the button below generates a private, temporary link valid for 15 minutes.",
-            ._inline = false
+            .Inline = false
         }
     };
 

@@ -212,10 +212,10 @@ void on_create_clan_command(struct discord *client, const struct discord_interac
     snprintf(tag_str, sizeof(tag_str), "`[%s]`", clan_name);
 
     struct discord_embed_field fields[] = {
-        { .name = "👑 Clan Leader", .value = leader_mention, ._inline = true },
-        { .name = "🏷️ Clan Role", .value = role_mention, ._inline = true },
-        { .name = "👥 Clan Tag", .value = tag_str, ._inline = true },
-        { .name = "📜 Description", .value = (char *)clan_desc, ._inline = false }
+        { .name = "👑 Clan Leader", .value = leader_mention, .Inline = true },
+        { .name = "🏷️ Clan Role", .value = role_mention, .Inline = true },
+        { .name = "👥 Clan Tag", .value = tag_str, .Inline = true },
+        { .name = "📜 Description", .value = (char *)clan_desc, .Inline = false }
     };
 
     struct discord_embed embed = {
@@ -363,8 +363,8 @@ void on_invite_clan_command(struct discord *client, const struct discord_interac
     snprintf(leader_mention, sizeof(leader_mention), "<@%s>", clan.owner_id);
 
     struct discord_embed_field dm_fields[] = {
-        { .name = "👑 Clan Leader", .value = leader_mention, ._inline = true },
-        { .name = "🏷️ Clan Tag", .value = clan.name, ._inline = true }
+        { .name = "👑 Clan Leader", .value = leader_mention, .Inline = true },
+        { .name = "🏷️ Clan Tag", .value = clan.name, .Inline = true }
     };
 
     struct discord_embed dm_embed = {

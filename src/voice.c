@@ -226,10 +226,10 @@ void on_voice_state_update(struct discord *client, const struct discord_voice_st
             discord_modify_guild_member(client, guild_id, user_id, &mod, NULL);
 
             struct discord_embed_field fields[] = {
-                { .name = "🔒 `/voice-private`", .value = "Lock your voice channel to invite-only.", ._inline = true },
-                { .name = "🔓 `/voice-public`", .value = "Unlock your voice channel for everyone.", ._inline = true },
-                { .name = "✅ `/voice-permit @user`", .value = "Allow a specific member to join.", ._inline = false },
-                { .name = "👢 `/voice-kick @user`", .value = "Disconnect a user from your channel.", ._inline = false }
+                { .name = "🔒 `/voice-private`", .value = "Lock your voice channel to invite-only.", .Inline = true },
+                { .name = "🔓 `/voice-public`", .value = "Unlock your voice channel for everyone.", .Inline = true },
+                { .name = "✅ `/voice-permit @user`", .value = "Allow a specific member to join.", .Inline = false },
+                { .name = "👢 `/voice-kick @user`", .value = "Disconnect a user from your channel.", .Inline = false }
             };
 
             struct discord_embed embed = {
