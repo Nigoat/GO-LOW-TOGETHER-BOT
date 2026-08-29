@@ -87,6 +87,7 @@ void on_create_clan_command(struct discord *client, const struct discord_interac
     const char *clan_name = NULL;
     const char *clan_desc = NULL;
     const char *picture_url = NULL;
+    u64snowflake picture_attachment_id = 0;
 
     if (event->data && event->data->options) {
         for (int i = 0; i < event->data->options->size; i++) {
@@ -97,27 +98,8 @@ void on_create_clan_command(struct discord *client, const struct discord_interac
             } else if (strcmp(opt->name, "description") == 0 && opt->value) {
                 clan_desc = opt->value;
             } else if (strcmp(opt->name, "picture") == 0 && opt->value) {
-                u64snowflake att_id = (u64snowflake)strtoull(opt->value, NULL, 10);
-                if (att_id != 0 && event->data->resolved && event->data->resolved->attachments) {
-                    struct discord_attachments *atts = event->data->resolved->attachments;
-                    for (int j = 0; j < atts->size; j++) {
-                        if (atts->array[j].id == att_id) {
-                            if (atts->array[j].size > 4 * 1024 * 1024) {
-                                struct discord_interaction_response bad_resp = {
-                                    .type = DISCORD_INTERACTION_CHANNEL_MESSAGE_WITH_SOURCE,
-                                    .data = &(struct discord_interaction_callback_data){
-                                        .content = "❌ Clan picture must be smaller than 4MB!",
-                                        .flags = DISCORD_MESSAGE_EPHEMERAL
-                                    }
-                                };
-                                discord_create_interaction_response(client, event->id, event->token, &bad_resp, NULL);
-                                return;
-                            }
-                            picture_url = atts->array[j].url;
-                            break;
-                        }
-                    }
-                }
+                picture_attachment_id = (u64snowflake)strtoull(opt->value, NULL, 10);
+                (void)picture_attachment_id;
             }
         }
     }
