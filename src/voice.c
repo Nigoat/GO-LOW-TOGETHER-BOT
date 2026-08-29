@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <ctype.h>
 #include <inttypes.h>
 #include <pthread.h>
 #include <concord/discord.h>
@@ -37,18 +38,33 @@ void voice_init(void)
     pthread_mutex_unlock(&g_voice_mutex);
 }
 
-static int is_create_voice_channel(struct discord *client, u64snowflake channel_id)
+static int is_create_voice_channel(struct discord *client, u64snowflake channel_id, u64snowflake *parent_id_out)
 {
     if (channel_id == 0) return 0;
-    if (g_config.create_voice_channel_id != 0 && channel_id == g_config.create_voice_channel_id)
+    if (g_config.create_voice_channel_id != 0 && channel_id == g_config.create_voice_channel_id) {
+        if (parent_id_out) {
+            struct discord_channel ch = { 0 };
+            struct discord_ret_channel ret = { .sync = &ch };
+            if (discord_get_channel(client, channel_id, &ret) == CCORD_OK) {
+                *parent_id_out = ch.parent_id;
+            }
+        }
         return 1;
+    }
 
     struct discord_channel ch = { 0 };
     struct discord_ret_channel ret = { .sync = &ch };
     if (discord_get_channel(client, channel_id, &ret) == CCORD_OK && ch.name) {
-        if (strcasecmp(ch.name, "create your voice") == 0 ||
-            strcasecmp(ch.name, "create-your-voice") == 0 ||
-            strcasecmp(ch.name, "create voice") == 0) {
+        char lower[128];
+        size_t n = strlen(ch.name);
+        if (n >= sizeof(lower)) n = sizeof(lower) - 1;
+        for (size_t i = 0; i < n; i++) {
+            lower[i] = (char)tolower((unsigned char)ch.name[i]);
+        }
+        lower[n] = '\0';
+
+        if (strstr(lower, "create") && strstr(lower, "voice")) {
+            if (parent_id_out) *parent_id_out = ch.parent_id;
             return 1;
         }
     }
@@ -128,6 +144,9 @@ void on_voice_state_update(struct discord *client, const struct discord_voice_st
     u64snowflake guild_id = event->guild_id ? event->guild_id : g_config.guild_id;
     u64snowflake joined_channel_id = event->channel_id;
 
+    log_info("Voice state update: user_id=%" PRIu64 ", channel_id=%" PRIu64 ", guild_id=%" PRIu64,
+             user_id, joined_channel_id, guild_id);
+
     pthread_mutex_lock(&g_voice_mutex);
 
     tracked_voice_t *prev_tv = find_user_channel_locked(user_id);
@@ -138,7 +157,6 @@ void on_voice_state_update(struct discord *client, const struct discord_voice_st
         remove_member_from_tracked_locked(prev_tv, user_id);
 
         if (prev_tv->member_count == 0) {
-
             log_info("Temp voice channel %" PRIu64 " is empty, deleting", left_channel_id);
 
             int idx = (int)(prev_tv - g_tracked_channels);
@@ -149,7 +167,6 @@ void on_voice_state_update(struct discord *client, const struct discord_voice_st
             db_temp_voice_delete(left_channel_id);
             pthread_mutex_lock(&g_voice_mutex);
         } else if (user_id == owner_id) {
-
             int r = rand() % prev_tv->member_count;
             u64snowflake new_owner_id = prev_tv->members[r];
             prev_tv->owner_id = new_owner_id;
@@ -184,16 +201,37 @@ void on_voice_state_update(struct discord *client, const struct discord_voice_st
 
     pthread_mutex_unlock(&g_voice_mutex);
 
-    if (joined_channel_id != 0 && is_create_voice_channel(client, joined_channel_id)) {
-        const char *username = (event->member && event->member->user) ?
-            event->member->user->username : "User";
+    u64snowflake category_id = 0;
+    if (joined_channel_id != 0 && is_create_voice_channel(client, joined_channel_id, &category_id)) {
+        char username_buf[64] = { 0 };
+        const char *username = NULL;
+        if (event->member && event->member->nick && *event->member->nick) {
+            username = event->member->nick;
+        } else if (event->member && event->member->user && event->member->user->username) {
+            username = event->member->user->username;
+        }
+        if (!username) {
+            struct discord_guild_member gm = { 0 };
+            struct discord_ret_guild_member gm_ret = { .sync = &gm };
+            if (discord_get_guild_member(client, guild_id, user_id, &gm_ret) == CCORD_OK) {
+                if (gm.nick && *gm.nick) {
+                    strncpy(username_buf, gm.nick, sizeof(username_buf) - 1);
+                    username = username_buf;
+                } else if (gm.user && gm.user->username) {
+                    strncpy(username_buf, gm.user->username, sizeof(username_buf) - 1);
+                    username = username_buf;
+                }
+            }
+        }
+        if (!username || !*username) username = "User";
 
         char ch_name[100];
         snprintf(ch_name, sizeof(ch_name), "🔊 %s's Room", username);
 
         struct discord_create_guild_channel params = {
             .name = ch_name,
-            .type = DISCORD_CHANNEL_GUILD_VOICE
+            .type = DISCORD_CHANNEL_GUILD_VOICE,
+            .parent_id = category_id
         };
 
         struct discord_channel created_ch = { 0 };
@@ -201,7 +239,8 @@ void on_voice_state_update(struct discord *client, const struct discord_voice_st
             .sync = &created_ch
         };
 
-        if (discord_create_guild_channel(client, guild_id, &params, &ret) == CCORD_OK && created_ch.id != 0) {
+        CCORDcode ch_code = discord_create_guild_channel(client, guild_id, &params, &ret);
+        if (ch_code == CCORD_OK && created_ch.id != 0) {
             u64snowflake new_ch_id = created_ch.id;
             log_info("Created temp voice channel %" PRIu64 " for user %" PRIu64, new_ch_id, user_id);
 
@@ -223,7 +262,11 @@ void on_voice_state_update(struct discord *client, const struct discord_voice_st
             struct discord_modify_guild_member mod = {
                 .channel_id = new_ch_id
             };
-            discord_modify_guild_member(client, guild_id, user_id, &mod, NULL);
+            CCORDcode move_code = discord_modify_guild_member(client, guild_id, user_id, &mod, NULL);
+            if (move_code != CCORD_OK) {
+                log_error("Failed to move user %" PRIu64 " to new voice channel %" PRIu64 " (error: %d)",
+                          user_id, new_ch_id, move_code);
+            }
 
             struct discord_embed_field fields[] = {
                 { .name = "🔒 `/voice-private`", .value = "Lock your voice channel to invite-only.", .Inline = true },
@@ -241,7 +284,7 @@ void on_voice_state_update(struct discord *client, const struct discord_voice_st
                     .array = fields
                 },
                 .footer = &(struct discord_embed_footer){
-                    .text = "Bare Metal Builders • Dynamic Voice"
+                    .text = "GO LOW TOGETHER • Dynamic Voice"
                 }
             };
 
@@ -252,6 +295,9 @@ void on_voice_state_update(struct discord *client, const struct discord_voice_st
                 }
             };
             discord_create_message(client, new_ch_id, &msg, NULL);
+        } else {
+            log_error("Failed to create voice channel for user %" PRIu64 " in guild %" PRIu64 " (code: %d)",
+                      user_id, guild_id, ch_code);
         }
     }
 }

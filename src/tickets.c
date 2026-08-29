@@ -57,7 +57,7 @@ static void done_ticket_created(struct discord *client,
             .array = fields
         },
         .footer = &(struct discord_embed_footer){
-            .text = "Bare Metal Builders • Support Desk"
+            .text = "GO LOW TOGETHER • Support Desk"
         }
     };
 
@@ -147,7 +147,7 @@ void on_close_ticket_button(struct discord *client, const struct discord_interac
         &(struct discord_interaction_response){
             .type = DISCORD_INTERACTION_CHANNEL_MESSAGE_WITH_SOURCE,
             .data = &(struct discord_interaction_callback_data){
-                .content = "🔒 Ticket closed. Thank you for contacting Bare Metal Builders support.",
+                .content = "🔒 Ticket closed. Thank you for contacting GO LOW TOGETHER support.",
                 .flags = DISCORD_MESSAGE_EPHEMERAL
             }
         }, NULL);
@@ -178,7 +178,7 @@ void on_send_ticket_command(struct discord *client, const struct discord_interac
     };
 
     struct discord_embed embed = {
-        .title = "🎫 Bare Metal Builders — Support & Inquiry Desk",
+        .title = "🎫 GO LOW TOGETHER — Support & Inquiry Desk",
         .description = "Need help from our team, want to report an issue, or discuss partnerships and projects?\n\n"
                        "Click the button below to open a private support ticket.",
         .color = 0xF1C40F,
@@ -187,7 +187,7 @@ void on_send_ticket_command(struct discord *client, const struct discord_interac
             .array = fields
         },
         .footer = &(struct discord_embed_footer){
-            .text = "Bare Metal Builders • Support Center"
+            .text = "GO LOW TOGETHER • Support Center"
         }
     };
 

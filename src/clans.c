@@ -200,14 +200,14 @@ void on_create_clan_command(struct discord *client, const struct discord_interac
 
     struct discord_embed embed = {
         .title = "⚔️ Clan Successfully Created!",
-        .description = "A new clan has been founded in Bare Metal Builders!",
+        .description = "A new clan has been founded in GO LOW TOGETHER!",
         .color = 0xE67E22,
         .fields = &(struct discord_embed_fields){
             .size = sizeof(fields) / sizeof(fields[0]),
             .array = fields
         },
         .footer = &(struct discord_embed_footer){
-            .text = "Bare Metal Builders • Clan System"
+            .text = "GO LOW TOGETHER • Clan System"
         }
     };
 
@@ -356,7 +356,7 @@ void on_invite_clan_command(struct discord *client, const struct discord_interac
             .array = dm_fields
         },
         .footer = &(struct discord_embed_footer){
-            .text = "Bare Metal Builders • Clan Invitation"
+            .text = "GO LOW TOGETHER • Clan Invitation"
         }
     };
 

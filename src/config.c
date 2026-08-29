@@ -78,8 +78,53 @@ u64snowflake *config_parse_snowflake_list(const char *env_name, int *count_out)
     return ids;
 }
 
+static void config_load_dotenv(void)
+{
+    FILE *f = fopen(".env", "r");
+    if (!f) {
+        f = fopen("/bot/GO-LOW-TOGETHER-BOT/.env", "r");
+    }
+    if (!f) return;
+
+    char line[1024];
+    while (fgets(line, sizeof(line), f)) {
+        char *p = line;
+        while (*p == ' ' || *p == '\t') p++;
+        if (*p == '#' || *p == '\n' || *p == '\r' || *p == '\0') continue;
+
+        char *eq = strchr(p, '=');
+        if (!eq) continue;
+
+        *eq = '\0';
+        char *key = p;
+        char *val = eq + 1;
+
+        while (*key && (key[strlen(key) - 1] == ' ' || key[strlen(key) - 1] == '\t')) {
+            key[strlen(key) - 1] = '\0';
+        }
+
+        while (*val == ' ' || *val == '\t') val++;
+        int vlen = strlen(val);
+        while (vlen > 0 && (val[vlen - 1] == '\n' || val[vlen - 1] == '\r' || val[vlen - 1] == ' ' || val[vlen - 1] == '\t')) {
+            val[--vlen] = '\0';
+        }
+
+        if (vlen >= 2 && ((val[0] == '"' && val[vlen - 1] == '"') || (val[0] == '\'' && val[vlen - 1] == '\''))) {
+            val[vlen - 1] = '\0';
+            val++;
+        }
+
+        if (*key) {
+            setenv(key, val, 0);
+        }
+    }
+    fclose(f);
+}
+
 void config_load(void)
 {
+    config_load_dotenv();
+
     g_config.bot_token = config_require_env("BOT_TOKEN");
     g_config.database_url = config_require_env("DATABASE_URL");
     g_config.website_base_url = config_require_env("WEBSITE_BASE_URL");

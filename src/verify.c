@@ -68,7 +68,7 @@ void on_verify_button(struct discord *client, const struct discord_interaction *
         .description = desc,
         .color = 0x2ECC71,
         .footer = &(struct discord_embed_footer){
-            .text = "Bare Metal Builders • Secure Verification"
+            .text = "GO LOW TOGETHER • Secure Verification"
         }
     };
 
@@ -128,16 +128,16 @@ void on_send_verify_command(struct discord *client, const struct discord_interac
     };
 
     struct discord_embed embed = {
-        .title = "🛡️ Bare Metal Builders — Server Verification",
-        .description = "Welcome to **Bare Metal Builders**!\n\n"
-                       "To keep our community safe and assign your programming language & experience roles, please verify your account using the button below.",
+        .title = "🛡️ GO LOW TOGETHER — Server Verification",
+        .description = "Welcome to **GO LOW TOGETHER**!\n\n"
+                       "To gain full access to the server, participate in voice channels, create clans, and select your programming skill roles, please click the button below to verify your account.",
         .color = 0x5865F2,
         .fields = &(struct discord_embed_fields){
             .size = sizeof(fields) / sizeof(fields[0]),
             .array = fields
         },
         .footer = &(struct discord_embed_footer){
-            .text = "Bare Metal Builders • Automated Security Desk"
+            .text = "GO LOW TOGETHER • Automated Security Desk"
         }
     };
 
