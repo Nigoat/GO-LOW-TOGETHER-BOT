@@ -143,6 +143,7 @@ void config_load(void)
     g_config.role_rust = config_parse_snowflake("ROLE_RUST");
     g_config.role_zig = config_parse_snowflake("ROLE_ZIG");
     g_config.role_assembly = config_parse_snowflake("ROLE_ASSEMBLY");
+    g_config.role_other = config_parse_snowflake("ROLE_OTHER");
 
     g_config.role_beginner = config_parse_snowflake("ROLE_BEGINNER");
     g_config.role_intermediate = config_parse_snowflake("ROLE_INTERMEDIATE");
