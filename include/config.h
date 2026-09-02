@@ -23,6 +23,7 @@ struct bmb_config {
     u64snowflake role_rust;
     u64snowflake role_zig;
     u64snowflake role_assembly;
+    u64snowflake role_other;
 
     u64snowflake role_beginner;
     u64snowflake role_intermediate;
