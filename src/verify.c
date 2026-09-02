@@ -114,7 +114,7 @@ void on_send_verify_command(struct discord *client, const struct discord_interac
     struct discord_embed_field fields[] = {
         {
             .name = "⚡ Unlocked Roles & Perks",
-            .value = "• Access to all programming channels (C, C++, Rust, Zig, Assembly)\n"
+            .value = "• Access to all programming channels (C, C++, Rust, Zig, Assembly, Other)\n"
                      "• Skill level tags (Beginner, Intermediate, Advanced, Wizard)\n"
                      "• Access to voice rooms and live coding channels\n"
                      "• Clan creation and invitations",
