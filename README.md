@@ -14,8 +14,7 @@
 
 **either join the discord server(helpful to grow my discord server): https://discord.gg/TZCHGu9e3H**
 **OR donate! this is really helpful and would support me:**
-<a href="https://buy.polar.sh/polar_cl_24Yb1EYlgCEmTqQxeMoN8cuvxqqw8tpwJmHqA1tXXw1" data-polar-checkout data-polar-checkout-theme="dark">DONATE!</a>
-<script src="https://cdn.jsdelivr.net/npm/@polar-sh/checkout@0.1/dist/embed.global.js" defer data-auto-init></script>
+**[DONATE!](https://buy.polar.sh/polar_cl_24Yb1EYlgCEmTqQxeMoN8cuvxqqw8tpwJmHqA1tXXw1)**
 
 # LICENSE:
 
